@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: style-feedback-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: style_feedback
+      POSTGRES_USER: style_user
+      POSTGRES_PASSWORD: style_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
