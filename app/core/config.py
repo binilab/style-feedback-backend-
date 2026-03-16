@@ -8,6 +8,10 @@ class Settings(BaseSettings):
 
     DATABASE_URL:str = "postgresql+psycopg://style_user:style_password@localhost:5432/style_feedback"
 
+    SECRET_KEY:str = "change-this-to-a-random-secret-key"
+    ALGORITHM:str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES:int = 30
+    
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
