@@ -1,29 +1,43 @@
-from typing import Any  
+from sqlalchemy import select 
+from sqlalchemy.orm import Session 
 from fastapi import HTTPException, status 
-from app.domain.user.schemas import UserCreate
 
 
-users_store: list[dict[str,Any]] = []
+from app.domain.user.models import User 
+from app.domain.user.schemas import UserCreate 
 
 
-def create_user(user_in: UserCreate) -> dict[str,Any]:
-    for existing_user in users_store: 
-        if existing_user['email'] == user_in.email:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="이미 가입된 이메일입니다."
-            )
-    new_user = {
-        "id": len(users_store)+1,
-        "username": user_in.username,
-        "email": user_in.email,
-    }
+def fake_hash_password(password:str)-> str:
+    return f"hashed::{password}"
 
-    users_store.append(new_user)
 
-    return new_user
+def create_user(db:Session, user_in: UserCreate) -> User: 
+    existing_user = db.scalar(
+        select(User).where(User.email == user_in.email)
+    )
 
-def list_users() -> list[dict[str,Any]]:
-    return users_store
+    if existing_user is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="이미 가입된 이메일입니다."
+        )
+    
+    new_user = User(
+        username= user_in.username,
+        email = user_in.email,
+        password_hash = fake_hash_password(user_in.password)
+    )
 
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user 
+
+def list_users(db:Session) -> list[User]:
+    users= db.scalars(
+        select(User).order_by(User.id.desc())
+    ).all()
+
+    return users 
 
