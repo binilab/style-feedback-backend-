@@ -10,7 +10,7 @@ from app.core.config import settings
 from app.core.database import Base 
 from app.domain.user import models as user_models  # User 모델을 import 해서 metadata에 등록되게 함
 from app.domain.post import models as post_models  # Post 모델을 import 해서 metadata에 등록되게 함
-
+from app.domain.comment import models as comment_models  # Comment 모델을 import 해서 metadata에 등록되게 함
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
