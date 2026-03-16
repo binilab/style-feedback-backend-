@@ -12,27 +12,31 @@ class Post(Base):  # posts 테이블과 연결될 ORM 클래스
     __tablename__ = "posts"  # 실제 DB 테이블 이름
 
     id: Mapped[int] = mapped_column(primary_key=True)  # 게시글 기본키 id
-    title: Mapped[str] = mapped_column(String(200), nullable=False)  # 게시글 제목, 필수값
-    content: Mapped[str] = mapped_column(Text, nullable=False)  # 게시글 본문, 길 수 있으므로 Text 사용
+    title: Mapped[str] = mapped_column(String(200), nullable=False)  # 게시글 제목
+    content: Mapped[str] = mapped_column(Text, nullable=False)  # 게시글 본문
 
     author_id: Mapped[int] = mapped_column(  # 작성자 user의 id를 담는 외래키 컬럼
-        ForeignKey("users.id", ondelete="CASCADE"),  # users.id를 참조하고, 유저 삭제 시 연관 글도 DB 차원에서 정리
-        nullable=False,  # 작성자 없는 게시글은 허용하지 않음
-        index=True,  # author_id로 조회할 가능성이 높아서 인덱스 추가
+        ForeignKey("users.id", ondelete="CASCADE"),  # users.id 참조
+        nullable=False,  # 작성자 없는 게시글 불가
+        index=True,  # author_id 조회용 인덱스
     )
 
     created_at: Mapped[datetime] = mapped_column(  # 생성 시각 컬럼
         DateTime(timezone=True),  # 타임존 포함 datetime 타입
-        server_default=func.now(),  # DB가 현재 시각을 기본값으로 넣음
+        server_default=func.now(),  # DB가 현재 시각 기본값 넣기
         nullable=False,  # 필수값
     )
     updated_at: Mapped[datetime] = mapped_column(  # 수정 시각 컬럼
         DateTime(timezone=True),  # 타임존 포함 datetime 타입
-        server_default=func.now(),  # 처음 생성 시에도 현재 시각을 넣음
-        onupdate=func.now(),  # ORM UPDATE 시 현재 시각으로 갱신
+        server_default=func.now(),  # 처음 생성 시 현재 시각
+        onupdate=func.now(),  # 수정 시 현재 시각으로 갱신
         nullable=False,  # 필수값
     )
 
     author: Mapped["User"] = relationship(  # Post -> User 방향 ORM 관계
-        back_populates="posts"  # User.posts 와 서로 연결됨
+        back_populates="posts"  # User.posts 와 연결
+    )
+
+    comments: Mapped[list["Comment"]] = relationship(  # Post -> Comment 방향 ORM 관계
+        back_populates="post"  # Comment.post 와 연결
     )
