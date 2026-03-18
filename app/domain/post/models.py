@@ -40,3 +40,7 @@ class Post(Base):  # posts 테이블과 연결될 ORM 클래스
     comments: Mapped[list["Comment"]] = relationship(  # Post -> Comment 방향 ORM 관계
         back_populates="post"  # Comment.post 와 연결
     )
+
+    likes: Mapped[list["PostLike"]] = relationship(  # Post -> PostLike 방향 ORM 관계
+        back_populates="post"  # PostLike.post 와 연결
+    )

@@ -11,7 +11,7 @@ from app.domain.user.schemas import UserCreate
 
 def create_user(db:Session, user_in:UserCreate)-> User:
     existing_user = db.scalar(
-        select(User).where(User.email == user_in.eamil)
+        select(User).where(User.email == user_in.email)
     )
 
     if existing_user is not None:
@@ -22,8 +22,8 @@ def create_user(db:Session, user_in:UserCreate)-> User:
     
     new_user = User(
         username=user_in.username,
-        email= user_in.email,
-        password=hash_password(user_in.password)
+        email=user_in.email,
+        password_hash=hash_password(user_in.password)
     )
 
     db.add(new_user)
@@ -34,8 +34,8 @@ def create_user(db:Session, user_in:UserCreate)-> User:
 
 def list_users(db:Session)-> list[User]:
     users = db.scalars(
-        select(User).order_by(User.id.desc()).all()
-    )
+        select(User).order_by(User.id.desc())
+    ).all()
     return users 
 
 def get_user_by_email(db:Session, email:str)-> User | None:
